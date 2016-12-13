@@ -1,0 +1,43 @@
+import {Component, OnInit} from "@angular/core";
+import ChatService from "./chat.service";
+import {PageRoute} from "nativescript-angular";
+import "rxjs/add/operator/switchMap";
+
+@Component({
+  selector: "hkm-room-chat",
+  templateUrl: "room.chat.component.html",
+})
+export class RoomChatComponent implements OnInit {
+  roomId: number;
+  room: Object;
+  messages: Object = [];
+  newMessage:any = "";
+
+  constructor(private chatService: ChatService, private pageRoute: PageRoute) {
+  }
+
+
+  ngOnInit(): void {
+    // use switchMap to get the latest activatedRoute instance
+    this.pageRoute
+      .activatedRoute
+      .switchMap(activatedRoute => activatedRoute.params)
+      .forEach((params) => {
+        this.roomId = +params['id'];
+        this.room = this.chatService
+          .getRoom(this.roomId);
+        console.log('@@@@@@ Room @@@@@', JSON.stringify(this.room, null, 2));
+        this.messages = this.chatService.getRoomMessages(this.roomId);
+        console.log('@@@@@@ Message @@@@@', JSON.stringify(this.messages, null, 2));
+      });
+  }
+
+  addMessage(){
+    console.log('############################ POLI ###########', 'HELLO');
+
+    console.log('############################ POLI ###########', this.newMessage);
+    this.chatService
+      .addMessage(this.roomId,this.newMessage);
+    this.newMessage ='';
+  }
+}
