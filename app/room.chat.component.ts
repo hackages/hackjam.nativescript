@@ -8,12 +8,12 @@ import "rxjs/add/operator/switchMap";
   templateUrl: "room.chat.component.html",
   styleUrls: ['room.chat.component.css']
 })
-export class RoomChatComponent implements OnInit, AfterViewInit{
+export class RoomChatComponent implements OnInit, AfterViewInit {
   roomId: number;
   room: Object;
   messages: Object = [];
-  newMessage:any = "";
-  @ViewChild('messageInput') messageInput:ElementRef;
+  newMessage: any = "";
+  @ViewChild('messageInput') messageInput: ElementRef;
 
   constructor(private chatService: ChatService, private pageRoute: PageRoute) {
   }
@@ -36,15 +36,15 @@ export class RoomChatComponent implements OnInit, AfterViewInit{
 
 
   ngAfterViewInit(): void {
-    this.messageInput.nativeElement.focus();
+    // this.messageInput.nativeElement.focus();
   }
 
-  addMessage(){
+  addMessage() {
     console.log('############################ POLI ###########', 'HELLO');
 
     console.log('############################ POLI ###########', this.newMessage);
     this.chatService
-      .addMessage(this.roomId,this.newMessage);
-    this.newMessage ='';
+      .addMessage(this.roomId, this.newMessage);
+    this.newMessage = '';
   }
 }
