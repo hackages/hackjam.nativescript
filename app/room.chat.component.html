@@ -3,8 +3,8 @@
     ></NavigationButton>
 </ActionBar>
 <StackLayout>
-
-    <StackLayout *ngFor="let message of messages; let index=index; let odd=odd; let even=even;" orientation="horizontal" [class.odd]="odd" [class.even]="even">
+    <StackLayout *ngFor="let message of messages; let index=index; let odd=odd; let even=even;" orientation="horizontal"
+                 [class.odd]="odd" [class.even]="even">
         <Image [src]="chatService.getUserById(message.authorId).image" class="chatpic"></Image>
         <StackLayout>
             <Label [text]="message.body" textWrap="true"
@@ -14,14 +14,13 @@
                    margin="3"></Label>
         </StackLayout>
     </StackLayout>
-
     <StackLayout padding="10">
         <TextField
                 #messageInput
-                    [(ngModel)]="newMessage"
-                   hint="Enter your message"
-                   returnKeyType="send"
-                   (returnPress)="addMessage()"
+                [(ngModel)]="newMessage"
+                hint="Enter your message"
+                returnKeyType="send"
+                (returnPress)="addMessage()"
         ></TextField>
     </StackLayout>
 </StackLayout>

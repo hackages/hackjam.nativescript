@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ChangeDetectionStrategy} from "@angular/core";
 import ChatService from "./chat.service";
 import * as dialogs from "ui/dialogs";
 import {RouterExtensions} from "nativescript-angular";
@@ -9,13 +9,20 @@ import {RouterExtensions} from "nativescript-angular";
   styleUrls:['room.list.component.css']
 })
 export class RoomListComponent implements OnInit {
+  rooms = [];
 
   constructor(private chatService: ChatService, private routerExtensions: RouterExtensions) {
   }
 
 
   ngOnInit(): void {
+    this.chatService
+      .allRooms()
+      .subscribe((value) =>{
+        console.log('>>>>>>>>>>>>>>>>>>>>> Vlaue', JSON.stringify(value, null, 2));
 
+        this.rooms = Object.keys(value).map(k => value[k]);
+      })
   }
 
   onAddRoom() {

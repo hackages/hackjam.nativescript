@@ -13,7 +13,8 @@
                 android.systemIcon="ic_menu_add"
                 android.position="popup"></ActionItem>
 </ActionBar>
-<ListView [items]="chatService.allRooms()" (itemTap)="onItemTap($event)">
+
+<ListView [items]="rooms" (itemTap)="onItemTap($event)">
     <template let-item="item" let-i="index" let-odd="odd" let-even="even">
         <StackLayout orientation="horizontal" [class.odd]="odd" [class.even]="even">
             <Image src="~/images/room.png" width="72" height="72" margin="3 25 3 3"></Image>
@@ -21,3 +22,4 @@
         </StackLayout>
     </template>
 </ListView>
+
