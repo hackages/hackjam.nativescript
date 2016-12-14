@@ -4,18 +4,17 @@
 </ActionBar>
 <StackLayout>
 
-    <GridLayout *ngFor="let message of messages"
-                columns="auto, *, auto" rows="auto, 25" verticalAlignment="top" backgroundColor="lightgray">
-        <Image [src]="'~/images/'+message.author.image" rowSpan="2" width="72" height="72" margin="3"
-               verticalAlignment="top"></Image>
-        <Label [text]="message.body" textWrap="true" col="1" colSpan="2"
-               minHeight="50" fontSize="20" margin="3"></Label>
-        <Label [text]="message.author.name" col="1" row="1" fontSize="14" horizontalAlignment="left"
-               verticalAlignment="bottom"
-               margin="3"></Label>
-        <Label text="comments: 26" col="2" row="1" color="#10C2B0" fontSize="14" verticalAlignment="bottom"
-               margin="3"></Label>
-    </GridLayout>
+    <StackLayout *ngFor="let message of messages; let index=index; let odd=odd; let even=even;" orientation="horizontal" [class.odd]="odd" [class.even]="even">
+        <Image [src]="'~/images/'+message.author.image" class="chatpic"></Image>
+        <StackLayout>
+            <Label [text]="message.body" textWrap="true"
+                   minHeight="50" fontSize="20" margin="3"></Label>
+            <Label [text]="message.author.name" fontSize="14" horizontalAlignment="left"
+                   verticalAlignment="bottom"
+                   margin="3"></Label>
+        </StackLayout>
+    </StackLayout>
+
     <StackLayout padding="10">
         <TextField
                 #messageInput

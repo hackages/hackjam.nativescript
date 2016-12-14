@@ -6,6 +6,7 @@ import "rxjs/add/operator/switchMap";
 @Component({
   selector: "hkm-room-chat",
   templateUrl: "room.chat.component.html",
+  styleUrls: ['room.chat.component.css']
 })
 export class RoomChatComponent implements OnInit, AfterViewInit{
   roomId: number;

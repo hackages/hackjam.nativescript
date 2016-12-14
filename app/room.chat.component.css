@@ -1,0 +1,10 @@
+.odd {
+    background-color: aliceblue;
+}
+
+.chatpic {
+    width: 72;
+    height: 72;
+    border-radius: 36;
+    margin: 4;
+}
