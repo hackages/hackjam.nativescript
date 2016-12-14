@@ -2,6 +2,8 @@ import {Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/
 import ChatService from "./chat.service";
 import {PageRoute} from "nativescript-angular";
 import "rxjs/add/operator/switchMap";
+import {View} from "ui/core/view";
+
 
 @Component({
   selector: "hkm-room-chat",
@@ -37,6 +39,7 @@ export class RoomChatComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // this.messageInput.nativeElement.focus();
+    // this.messageInput.nativeElement.ios.inputAccessoryView = new View();
   }
 
   addMessage() {

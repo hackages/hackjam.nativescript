@@ -1,22 +1,40 @@
 import {Injectable} from "@angular/core";
 
 
-interface User {
+class User {
+
+  static i: number = 0;
+
+  constructor(name = "Guest", image = "https://api.adorable.io/avatars/253/st"){
+    this.id = (User.i++).toString();
+    this.name = name;
+    this.image = image;
+  }
+
   id: string;
   name: string;
-  token: string;
   image: string;
 }
 
 @Injectable()
 export default  class ChatService {
 
-  user: User = {
-    id: '',
-    name: '',
-    token: '',
-    image: ''
-  };
+  socket: any;
+
+  constructor(){
+    // this.socket = SocketIO.connect('http://localhost:5000');
+    // console.log(this.socket)
+/*    this.socket.socket.on('all rooms', (data) => {
+      this.rooms = data.rooms
+    })*/
+  }
+
+  currentUserId: string = "0";
+
+  users = [
+    new User("Bob"),
+    new User("Patrick", "https://api.adorable.io/avatars/253/ts")
+  ];
   // Some fake testing data
   rooms = [
     {
@@ -25,28 +43,19 @@ export default  class ChatService {
       messages: [
         {
           id: 233,
-          author: {
-            image: 'adam.jpg',
-            name: 'Adam',
-          },
+          authorId: '0',
           body: 'Hello Guys from Amsterdam!',
           created_at: Date.now()
         },
         {
           id: 2333,
-          author: {
-            image: 'ben.png',
-            name: 'Ben',
-          },
+          authorId: '1',
           body: 'Hello Guys !',
           created_at: Date.now()
         },
         {
           id: 2335,
-          author: {
-            image: 'max.png',
-            name: 'Max',
-          },
+          authorId: '0',
           body: 'Hello !',
           created_at: Date.now()
         }
@@ -72,6 +81,15 @@ export default  class ChatService {
     return null;
   }
 
+  getUserById(id){
+    for(let user of this.users){
+      if(user.id === id){
+        console.log(user)
+        return user
+      }
+    }
+  }
+
   getRoomMessages(roomId) {
     const room = this.getRoom(roomId);
     return room.messages;
@@ -81,10 +99,7 @@ export default  class ChatService {
     this.getRoom(roomId)
       .messages.push({
       id: Math.floor(Math.random() * 100),
-      author: {
-        image: 'adam.jpg',
-        name: 'Adam',
-      },
+      authorId: this.currentUserId,
       body: message,
       created_at: Date.now()
     })
@@ -99,10 +114,11 @@ export default  class ChatService {
 
   }
   getUser(){
-    return this.user;
+    return this.getUserById(this.currentUserId)
   }
   setUser(user) {
-    this.user.name = user.name;
-    this.user.image = user.image;
+    let tempUser = this.getUser()
+    tempUser.image = user.image;
+    tempUser.name = user.name;
   }
 }
