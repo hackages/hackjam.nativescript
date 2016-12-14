@@ -1,7 +1,3 @@
-ListView {
-
-}
-
 ListView > StackLayout {
     padding: 10px;
 }

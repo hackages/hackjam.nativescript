@@ -36,7 +36,6 @@ export class ProfileComponent implements OnInit {
   constructor(private chatService: ChatService, private routerExtensions: RouterExtensions) {
   }
 
-
   ngOnInit(): void {
     this.randomUrls = this.createRandomImageUrls();
 
@@ -45,7 +44,8 @@ export class ProfileComponent implements OnInit {
   }
 
   onSave() {
-    this.chatService.setUser(this.user);
+    this.chatService
+      .setUser(this.user);
     this.goBack();
   }
 
@@ -58,7 +58,6 @@ export class ProfileComponent implements OnInit {
     for (let i = 0; i < 10; i++) {
       result.push(`https://robohash.org/${Math.floor(Math.random() * 5000)}?set=set${Math.floor(Math.random() * 3) + 1}`);
     }
-    console.log('@@@@@@@@@@@@ URLS @@@@@@@@@@', result);
     return result;
   }
 
