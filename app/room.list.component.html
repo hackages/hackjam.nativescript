@@ -6,13 +6,11 @@
                 android.systemIcon="ic_menu_add"
                 android.position="popup"></ActionItem>
 </ActionBar>
-<GridLayout rows="*">
-    <ListView [items]="chatService.allRooms()" (itemTap)="onItemTap($event)">
-        <template let-item="item" let-i="index" let-odd="odd" let-even="even">
-            <StackLayout [class.odd]="odd" [class.even]="even" [nsRouterLink]="['/room',i]">
-                <Label [text]='"index: " + i'></Label>
-                <Label [text]='"[" + item.id +"] " + item.name'></Label>
-            </StackLayout>
-        </template>
-    </ListView>
-</GridLayout>
+<ListView [items]="chatService.allRooms()" (itemTap)="onItemTap($event)">
+    <template let-item="item" let-i="index" let-odd="odd" let-even="even">
+        <StackLayout orientation="horizontal" [class.odd]="odd" [class.even]="even">
+            <Image src="~/images/room.png" width="72" height="72" margin="3 25 3 3"></Image>
+            <Label [text]="item.name" col="1"></Label>
+        </StackLayout>
+    </template>
+</ListView>
