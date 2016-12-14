@@ -6,9 +6,11 @@ var room_list_component_1 = require("./room.list.component");
 var chat_service_1 = require("./chat.service");
 var room_chat_component_1 = require("./room.chat.component");
 var nativescript_angular_1 = require("nativescript-angular");
+var profile_component_1 = require("./profile.component");
 exports.routes = [
     { path: "", component: room_list_component_1.RoomListComponent },
     { path: "room/:id", component: room_chat_component_1.RoomChatComponent },
+    { path: "profile", component: profile_component_1.ProfileComponent },
 ];
 var AppModule = (function () {
     function AppModule() {
@@ -16,7 +18,11 @@ var AppModule = (function () {
     AppModule = __decorate([
         core_1.NgModule({
             declarations: [
-                app_component_1.AppComponent, room_list_component_1.RoomListComponent, room_chat_component_1.RoomChatComponent],
+                app_component_1.AppComponent,
+                room_list_component_1.RoomListComponent,
+                room_chat_component_1.RoomChatComponent,
+                profile_component_1.ProfileComponent
+            ],
             bootstrap: [app_component_1.AppComponent],
             imports: [
                 platform_1.NativeScriptModule,

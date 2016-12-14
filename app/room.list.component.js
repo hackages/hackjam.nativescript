@@ -2,9 +2,11 @@
 var core_1 = require("@angular/core");
 var chat_service_1 = require("./chat.service");
 var dialogs = require("ui/dialogs");
+var nativescript_angular_1 = require("nativescript-angular");
 var RoomListComponent = (function () {
-    function RoomListComponent(chatService) {
+    function RoomListComponent(chatService, routerExtensions) {
         this.chatService = chatService;
+        this.routerExtensions = routerExtensions;
     }
     RoomListComponent.prototype.ngOnInit = function () {
     };
@@ -25,12 +27,23 @@ var RoomListComponent = (function () {
             }
         });
     };
+    RoomListComponent.prototype.onItemTap = function (args) {
+        this.routerExtensions.navigate(["/room", this.chatService.allRooms()[args.index].id]);
+    };
+    RoomListComponent.prototype.goToProfile = function () {
+        this.routerExtensions.navigate(["/profile"], {
+            transition: {
+                name: "slideRight",
+                curve: "linear"
+            }
+        });
+    };
     RoomListComponent = __decorate([
         core_1.Component({
             selector: "hkm-room-list",
             templateUrl: "room.list.component.html",
         }), 
-        __metadata('design:paramtypes', [chat_service_1.default])
+        __metadata('design:paramtypes', [chat_service_1.default, nativescript_angular_1.RouterExtensions])
     ], RoomListComponent);
     return RoomListComponent;
 }());

@@ -5,16 +5,22 @@ import {RoomListComponent} from "./room.list.component";
 import ChatService from "./chat.service";
 import {RoomChatComponent} from "./room.chat.component";
 import {NativeScriptRouterModule, NativeScriptFormsModule} from "nativescript-angular";
+import {ProfileComponent} from "./profile.component";
 
 
 export const routes = [
   {path: "", component: RoomListComponent},
   {path: "room/:id", component: RoomChatComponent},
+  {path: "profile", component: ProfileComponent},
 ];
 
 @NgModule({
   declarations: [
-    AppComponent, RoomListComponent, RoomChatComponent],
+    AppComponent,
+    RoomListComponent,
+    RoomChatComponent,
+    ProfileComponent
+  ],
   bootstrap: [AppComponent],
   imports: [
     NativeScriptModule,

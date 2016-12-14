@@ -25,6 +25,9 @@ var RoomChatComponent = (function () {
             console.log('@@@@@@ Message @@@@@', JSON.stringify(_this.messages, null, 2));
         });
     };
+    RoomChatComponent.prototype.ngAfterViewInit = function () {
+        this.messageInput.nativeElement.focus();
+    };
     RoomChatComponent.prototype.addMessage = function () {
         console.log('############################ POLI ###########', 'HELLO');
         console.log('############################ POLI ###########', this.newMessage);
@@ -32,6 +35,10 @@ var RoomChatComponent = (function () {
             .addMessage(this.roomId, this.newMessage);
         this.newMessage = '';
     };
+    __decorate([
+        core_1.ViewChild('messageInput'), 
+        __metadata('design:type', core_1.ElementRef)
+    ], RoomChatComponent.prototype, "messageInput", void 0);
     RoomChatComponent = __decorate([
         core_1.Component({
             selector: "hkm-room-chat",

@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ViewChild, ElementRef, AfterViewInit} from "@angular/core";
 import ChatService from "./chat.service";
 import {PageRoute} from "nativescript-angular";
 import "rxjs/add/operator/switchMap";
@@ -7,11 +7,12 @@ import "rxjs/add/operator/switchMap";
   selector: "hkm-room-chat",
   templateUrl: "room.chat.component.html",
 })
-export class RoomChatComponent implements OnInit {
+export class RoomChatComponent implements OnInit, AfterViewInit{
   roomId: number;
   room: Object;
   messages: Object = [];
   newMessage:any = "";
+  @ViewChild('messageInput') messageInput:ElementRef;
 
   constructor(private chatService: ChatService, private pageRoute: PageRoute) {
   }
@@ -30,6 +31,11 @@ export class RoomChatComponent implements OnInit {
         this.messages = this.chatService.getRoomMessages(this.roomId);
         console.log('@@@@@@ Message @@@@@', JSON.stringify(this.messages, null, 2));
       });
+  }
+
+
+  ngAfterViewInit(): void {
+    this.messageInput.nativeElement.focus();
   }
 
   addMessage(){

@@ -17,7 +17,9 @@
                margin="3"></Label>
     </GridLayout>
     <StackLayout padding="10">
-        <TextField [(ngModel)]="newMessage"
+        <TextField
+                #messageInput
+                    [(ngModel)]="newMessage"
                    hint="Enter your message"
                    returnKeyType="send"
                    (returnPress)="addMessage()"

@@ -1,6 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import ChatService from "./chat.service";
 import * as dialogs from "ui/dialogs";
+import {RouterExtensions} from "nativescript-angular";
 
 @Component({
   selector: "hkm-room-list",
@@ -8,7 +9,7 @@ import * as dialogs from "ui/dialogs";
 })
 export class RoomListComponent implements OnInit {
 
-  constructor(private chatService: ChatService) {
+  constructor(private chatService: ChatService, private routerExtensions: RouterExtensions) {
   }
 
 
@@ -29,6 +30,17 @@ export class RoomListComponent implements OnInit {
 
       if (result && text) {
         this.chatService.addRoom(text);
+      }
+    });
+  }
+  onItemTap(args){
+    this.routerExtensions.navigate(["/room", this.chatService.allRooms()[args.index].id]);
+  }
+  goToProfile() {
+    this.routerExtensions.navigate(["/profile"], {
+      transition: {
+        name: "slideRight",
+        curve: "linear"
       }
     });
   }

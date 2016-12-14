@@ -2,6 +2,12 @@
 var core_1 = require("@angular/core");
 var ChatService = (function () {
     function ChatService() {
+        this.user = {
+            id: '',
+            name: '',
+            token: '',
+            image: ''
+        };
         // Some fake testing data
         this.rooms = [
             {
@@ -60,7 +66,8 @@ var ChatService = (function () {
         return room.messages;
     };
     ChatService.prototype.addMessage = function (roomId, message) {
-        this.getRoom(roomId).messages.push({
+        this.getRoom(roomId)
+            .messages.push({
             id: Math.floor(Math.random() * 100),
             author: {
                 image: 'adam.jpg',
@@ -76,6 +83,13 @@ var ChatService = (function () {
             name: roomName,
             messages: []
         });
+    };
+    ChatService.prototype.getUser = function () {
+        return this.user;
+    };
+    ChatService.prototype.setUser = function (user) {
+        this.user.name = user.name;
+        this.user.image = user.image;
     };
     ChatService = __decorate([
         core_1.Injectable(), 
