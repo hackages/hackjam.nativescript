@@ -27,26 +27,26 @@ export default  class ChatService {
           .readId()
           .then((currentUserId) => {
             console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reading from profile",
-            currentUserId)
+              currentUserId)
             this.currentUserId = currentUserId;
 
             if (!this.currentUserId) {
               this.createUser()
                 .then((result: FirebaseChildEvent) => {
                   console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Creating profile",
-                    JSON.stringify(result,null,2))
+                    JSON.stringify(result, null, 2))
                   this.profileStorage
                     .storeId(result.key)
                     .then(() => {
                       console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Storing profile",
-                        JSON.stringify(result,null,2))
+                        JSON.stringify(result, null, 2))
                       this.currentUserId = result.key;
                       this.profileStorage
                         .readId()
                         .then((newRead) => {
                           console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% New Reading from profile",
                             newRead)
-                      });
+                        });
 
                     })
                 })
@@ -72,12 +72,13 @@ export default  class ChatService {
           });
         }, '/messages');
       })
-      .catch(()=>{});
+      .catch(() => {
+      });
   }
 
 
   addChildEvenListener(firebaseEvent: FirebaseChildEvent, localSubject$): void {
-     // console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
+    // console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
     const currentValue = localSubject$.getValue();
 
     switch (firebaseEvent.type) {
@@ -153,15 +154,16 @@ export default  class ChatService {
   }
 
   addMessage(roomId, body) {
-    return Firebase.push(
-      `/messages`,
-      {
-        authorId: this.currentUserId,
-        body: body,
-        roomId: roomId
-      }
-    );
-
+    if (body) {
+      return Firebase.push(
+        `/messages`,
+        {
+          authorId: this.currentUserId,
+          body: body,
+          roomId: roomId
+        }
+      );
+    }
   }
 
 
