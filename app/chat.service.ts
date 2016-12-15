@@ -3,7 +3,7 @@ import {BehaviorSubject, Observable} from "rxjs";
 import {objectAssign} from "./utils";
 import * as AppSettings from "application-settings";
 import "rxjs/add/operator/map";
-import {RoomMap} from "./typing";
+import {RoomMap, FirebaseChildEvent} from "./typing";
 import Firebase = require("nativescript-plugin-firebase");
 
 
@@ -25,37 +25,35 @@ export default  class ChatService {
 
         if (!this.currentUserId) {
           this.createUser()
-            .then((result) => {
+            .then((result:FirebaseChildEvent) => {
               this.currentUserId = result.key;
               AppSettings.setString("currentUserId", this.currentUserId);
               console.info('User created ', this.currentUserId)
             })
         }
 
-        Firebase.addChildEventListener((result: any) => {
+        Firebase.addChildEventListener((result: FirebaseChildEvent) => {
           this.ngZone.run(() => {
             this.addChildEvenListener(result, this.rooms$);
           });
         }, '/rooms');
 
-        Firebase.addChildEventListener((result: any) => {
+        Firebase.addChildEventListener((result: FirebaseChildEvent) => {
           this.ngZone.run(() => {
             this.addChildEvenListener(result, this.user$);
           });
         }, '/users');
 
-        Firebase.addChildEventListener((result: any) => {
+        Firebase.addChildEventListener((result: FirebaseChildEvent) => {
           this.ngZone.run(() => {
             this.addChildEvenListener(result, this.messages$);
           });
         }, '/messages');
-
-
       });
   }
 
 
-  addChildEvenListener(firebaseEvent, localSubject$) {
+  addChildEvenListener(firebaseEvent: FirebaseChildEvent, localSubject$): void {
     console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
     const currentValue = localSubject$.getValue();
 
