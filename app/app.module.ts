@@ -6,6 +6,7 @@ import ChatService from "./chat.service";
 import {RoomChatComponent} from "./room.chat.component";
 import {NativeScriptRouterModule, NativeScriptFormsModule} from "nativescript-angular";
 import {ProfileComponent} from "./profile.component";
+import {ProfileStorage} from "./services/profile.storage.service";
 
 
 export const routes = [
@@ -30,7 +31,7 @@ export const routes = [
 
   ],
   schemas: [NO_ERRORS_SCHEMA],
-  providers: [ChatService]
+  providers: [ChatService, ProfileStorage]
 })
 export class AppModule {
 }

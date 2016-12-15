@@ -1,9 +1,9 @@
 import {Injectable, NgZone} from "@angular/core";
 import {BehaviorSubject, Observable} from "rxjs";
 import {objectAssign} from "./utils";
-import * as AppSettings from "application-settings";
 import "rxjs/add/operator/map";
 import {RoomMap, FirebaseChildEvent} from "./typing";
+import {ProfileStorage} from "./services/profile.storage.service";
 import Firebase = require("nativescript-plugin-firebase");
 
 
@@ -16,21 +16,43 @@ export default  class ChatService {
   user$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
   messages$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
 
-  constructor(private ngZone: NgZone) {
-    this.currentUserId = AppSettings.getString("currentUserId", null);
+  constructor(private ngZone: NgZone, private profileStorage: ProfileStorage) {
+
 
     Firebase
       .init({persist: false})
       .then(() => {
 
-        if (!this.currentUserId) {
-          this.createUser()
-            .then((result:FirebaseChildEvent) => {
-              this.currentUserId = result.key;
-              AppSettings.setString("currentUserId", this.currentUserId);
-              console.info('User created ', this.currentUserId)
-            })
-        }
+        this.profileStorage
+          .readId()
+          .then((currentUserId) => {
+            console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reading from profile",
+            currentUserId)
+            this.currentUserId = currentUserId;
+
+            if (!this.currentUserId) {
+              this.createUser()
+                .then((result: FirebaseChildEvent) => {
+                  console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Creating profile",
+                    JSON.stringify(result,null,2))
+                  this.profileStorage
+                    .storeId(result.key)
+                    .then(() => {
+                      console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Storing profile",
+                        JSON.stringify(result,null,2))
+                      this.currentUserId = result.key;
+                      this.profileStorage
+                        .readId()
+                        .then((newRead) => {
+                          console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% New Reading from profile",
+                            newRead)
+                      });
+
+                    })
+                })
+            }
+          });
+
 
         Firebase.addChildEventListener((result: FirebaseChildEvent) => {
           this.ngZone.run(() => {
@@ -49,12 +71,13 @@ export default  class ChatService {
             this.addChildEvenListener(result, this.messages$);
           });
         }, '/messages');
-      });
+      })
+      .catch(()=>{});
   }
 
 
   addChildEvenListener(firebaseEvent: FirebaseChildEvent, localSubject$): void {
-    console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
+     // console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
     const currentValue = localSubject$.getValue();
 
     switch (firebaseEvent.type) {

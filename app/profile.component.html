@@ -1,11 +1,11 @@
 <ActionBar title="HackProfile">
-    <NavigationButton text="Back" android.systemIcon="ic_menu_back"></NavigationButton>
+    <NavigationButton text="Back"></NavigationButton>
     <ActionItem (tap)="onSave()"
                 ios.systemIcon="0"
                 android.systemIcon="ic_menu_save"
                 ios.position="right"></ActionItem>
 </ActionBar>
-<GridLayout>
+<ScrollView>
 
     <StackLayout>
         <Image class="imageProfile"
@@ -21,18 +21,16 @@
                    [src]="url"
                    verticalAlignment="top" (tap)="setUserImage(url)"></Image>
         </WrapLayout>
-        <GridLayout #formControls
-                    class="form-controls"
-                    rows="auto, auto"
-                    translateY="50">
+        <StackLayout margin="15" backgroundColor="#f0f8ff">
             <TextField
                     [(ngModel)]="user.name"
                     hint="Your nickname"
-                    margin="3"
+                    margin="10"
                     horizontalAlignment="center"
                     row="0">
             </TextField>
-        </GridLayout>
+        </StackLayout>
+
 
     </StackLayout>
-</GridLayout>
+</ScrollView>
