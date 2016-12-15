@@ -27,10 +27,7 @@ import {RouterExtensions} from "nativescript-angular";
 })
 export class ProfileComponent implements OnInit {
 
-  user = {
-    name: '',
-    image: ''
-  };
+  user: any;
   randomUrls = [];
 
   constructor(private chatService: ChatService, private routerExtensions: RouterExtensions) {
@@ -39,14 +36,20 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     this.randomUrls = this.createRandomImageUrls();
 
-    this.user.name = this.chatService.getUser().name || '';
-    this.user.image = this.chatService.getUser().image || '~/images/base-profil.png';
+    this.chatService
+      .getConnectedUser()
+      .subscribe((value) => {
+        this.user = value;
+      });
+
   }
 
   onSave() {
     this.chatService
-      .setUser(this.user);
-    this.goBack();
+      .setUser(this.user)
+      .then(() => {
+        this.goBack();
+      });
   }
 
   goBack() {
@@ -65,3 +68,4 @@ export class ProfileComponent implements OnInit {
     this.user.image = url;
   }
 }
+

@@ -5,11 +5,11 @@
 <StackLayout>
     <StackLayout *ngFor="let message of messages; let index=index; let odd=odd; let even=even;" orientation="horizontal"
                  [class.odd]="odd" [class.even]="even">
-        <Image [src]="chatService.getUserById(message.authorId).image" class="chatpic"></Image>
+        <Image [src]="users[message.authorId].image" class="chatpic"></Image>
         <StackLayout>
             <Label [text]="message.body" textWrap="true"
                    minHeight="50" fontSize="20" margin="3"></Label>
-            <Label [text]="chatService.getUserById(message.authorId).name" fontSize="14" horizontalAlignment="left"
+            <Label [text]="users[message.authorId].name" fontSize="14" horizontalAlignment="left"
                    verticalAlignment="bottom"
                    margin="3"></Label>
         </StackLayout>

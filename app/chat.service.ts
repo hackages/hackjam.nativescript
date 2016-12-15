@@ -1,125 +1,147 @@
 import {Injectable, NgZone} from "@angular/core";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {objectAssign} from "./utils";
+import * as AppSettings from "application-settings";
+import "rxjs/add/operator/map";
+import {RoomMap} from "./typing";
 import Firebase = require("nativescript-plugin-firebase");
-
-class User {
-
-  static i: number = 0;
-
-  constructor(name = "Guest", image = "https://api.adorable.io/avatars/253/st") {
-    this.id = (User.i++).toString();
-    this.name = name;
-    this.image = image;
-  }
-
-  id: string;
-  name: string;
-  image: string;
-}
 
 
 @Injectable()
 export default  class ChatService {
 
-  socket: any;
-  config = {
-    databaseURL: "https://hackages-messenger.firebaseio.com/",
-  };
-  firebaseQueryOptions = {
-    orderBy: {
-      type: Firebase.QueryOrderByType.CHILD,
-      value: 'since'
-    }
-  };
-  currentUserId: string = "0";
-  
-  users = [
-    new User("Bob"),
-    new User("Patrick", "https://api.adorable.io/avatars/253/ts")
-  ];
-  rooms$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
+  currentUserId: string;
+
+  rooms$: BehaviorSubject<RoomMap> = new BehaviorSubject<RoomMap>({});
+  user$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
+  messages$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
 
   constructor(private ngZone: NgZone) {
+    this.currentUserId = AppSettings.getString("currentUserId", null);
+
     Firebase
       .init({persist: false})
       .then(() => {
+
+        if (!this.currentUserId) {
+          this.createUser()
+            .then((result) => {
+              this.currentUserId = result.key;
+              AppSettings.setString("currentUserId", this.currentUserId);
+              console.info('User created ', this.currentUserId)
+            })
+        }
+
         Firebase.addChildEventListener((result: any) => {
           this.ngZone.run(() => {
-            this.queryRoomsEvenListener(result, this.rooms$);
+            this.addChildEvenListener(result, this.rooms$);
           });
         }, '/rooms');
+
+        Firebase.addChildEventListener((result: any) => {
+          this.ngZone.run(() => {
+            this.addChildEvenListener(result, this.user$);
+          });
+        }, '/users');
+
+        Firebase.addChildEventListener((result: any) => {
+          this.ngZone.run(() => {
+            this.addChildEvenListener(result, this.messages$);
+          });
+        }, '/messages');
+
+
       });
   }
 
 
-  queryRoomsEvenListener(firebaseEvent, localSubject$) {
+  addChildEvenListener(firebaseEvent, localSubject$) {
     console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
     const currentValue = localSubject$.getValue();
 
     switch (firebaseEvent.type) {
       case "ChildAdded":
       case "ChildChanged":
-          localSubject$.next(objectAssign({}, currentValue, {[firebaseEvent.key]: firebaseEvent.value}));
+        localSubject$.next(objectAssign({}, currentValue, {[firebaseEvent.key]: firebaseEvent.value}));
         break;
       case "ChildRemoved":
-          const copy = objectAssign({}, currentValue);
-          delete copy[firebaseEvent.key];
-          localSubject$.next(copy);
+        const copy = objectAssign({}, currentValue);
+        delete copy[firebaseEvent.key];
+        localSubject$.next(copy);
         break;
 
     }
   }
 
   allRooms() {
-    return this.rooms$;
+    return this.rooms$.asObservable();
   }
 
   getRoom(roomId) {
     return this.rooms$.map(rooms => rooms[roomId]);
   }
 
-  getUserById(id) {
-    for (let user of this.users) {
-      if (user.id === id) {
-        console.log(user)
-        return user
-      }
-    }
-  }
-
-  getRoomMessages(roomId) {
-    const room = this.getRoom(roomId);
-    return null;
-  }
-
-  addMessage(roomId, message) {
-    // this.getRoom(roomId)
-    //   .messages.push({
-    //   id: Math.floor(Math.random() * 100),
-    //   authorId: this.currentUserId,
-    //   body: message,
-    //   created_at: Date.now()
-    // })
-  }
-
   addRoom(roomName) {
     Firebase.push(
       '/rooms',
       {
-        name:roomName
+        name: roomName
       }
     );
 
   }
 
-  getUser() {
+  createUser() {
+    return Firebase.push(
+      '/users',
+      {
+        name: `Guest ${Math.floor(Math.random() * 100000)}`,
+        image: 'https://api.adorable.io/avatars/253/ts'
+      }
+    );
+  }
+
+  getConnectedUser() {
     return this.getUserById(this.currentUserId)
   }
 
-  setUser(user) {
-    let tempUser = this.getUser()
-    tempUser.image = user.image;
-    tempUser.name = user.name;
+  getUsers() {
+    return this.user$.asObservable();
   }
+
+  getUserById(id) {
+    return this.user$.map(users => users[id]);
+  }
+
+  setUser({name, image}) {
+    return Firebase.update(`/users/${this.currentUserId}`, {
+      name,
+      image
+    });
+  }
+
+  getRoomMessages(roomId): Observable<any[]> {
+    return this.messages$
+      .map((values) => {
+        const messages = Object.keys(values)
+          .map(k => values[k])
+          .filter(m => m.roomId === roomId)
+        return messages;
+      });
+
+  }
+
+  addMessage(roomId, body) {
+    return Firebase.push(
+      `/messages`,
+      {
+        authorId: this.currentUserId,
+        body: body,
+        roomId: roomId
+      }
+    );
+
+  }
+
+
 }
