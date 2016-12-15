@@ -164,6 +164,7 @@ export default  class ChatService {
         }
       );
     }
+    return Promise.resolve(null);
   }
 
 
