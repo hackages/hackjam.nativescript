@@ -104,13 +104,15 @@ export default  class ChatService {
   }
 
   addRoom(roomName) {
-    Firebase.push(
-      '/rooms',
-      {
-        name: roomName
-      }
-    );
-
+    const name = roomName.trim();
+    if (name) {
+      Firebase.push(
+        '/rooms',
+        {
+          name: name
+        }
+      );
+    }
   }
 
   createUser() {
