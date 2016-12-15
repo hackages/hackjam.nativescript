@@ -12,6 +12,12 @@
       "version": "2.4.1"
     }
   },
+  "scripts": {
+    "ios":"tns run ios",
+    "android":"tns run android",
+    "deploy:ios":"tns deploy ios",
+    "deploy:android":"tns deploy android"
+  },
   "dependencies": {
     "@angular/common": "2.2.1",
     "@angular/compiler": "2.2.1",
