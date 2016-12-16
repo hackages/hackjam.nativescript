@@ -27,7 +27,6 @@ export const routes = [
     NativeScriptRouterModule,
     NativeScriptFormsModule,
     NativeScriptRouterModule.forRoot(routes)
-
   ],
   schemas: [NO_ERRORS_SCHEMA],
   providers: [ChatService]
