@@ -16,6 +16,13 @@ export interface Message {
 export interface RoomMap {
   [key: string]: Room
 }
+
+export interface UserMap {
+  [key: string]: User
+}
+export interface MessageMap {
+  [key: string]: Message
+}
 export interface FirebaseChildEvent{
   key:string;
   type:string;

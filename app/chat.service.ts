@@ -2,9 +2,9 @@ import {Injectable, NgZone} from "@angular/core";
 import {BehaviorSubject, Observable} from "rxjs";
 import {objectAssign} from "./utils";
 import "rxjs/add/operator/map";
-import {RoomMap, FirebaseChildEvent} from "./typing";
-import {ProfileStorage} from "./services/profile.storage.service";
+import {RoomMap, FirebaseChildEvent, Room, UserMap, MessageMap, User, Message} from "./typing";
 import Firebase = require("nativescript-plugin-firebase");
+import * as AppSettings from "application-settings";
 
 
 @Injectable()
@@ -13,46 +13,25 @@ export default  class ChatService {
   currentUserId: string;
 
   rooms$: BehaviorSubject<RoomMap> = new BehaviorSubject<RoomMap>({});
-  user$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
-  messages$: BehaviorSubject<{}> = new BehaviorSubject<{}>({});
+  user$: BehaviorSubject<UserMap> = new BehaviorSubject<UserMap>({});
+  messages$: BehaviorSubject<MessageMap> = new BehaviorSubject<MessageMap>({});
 
-  constructor(private ngZone: NgZone, private profileStorage: ProfileStorage) {
+  constructor(private ngZone: NgZone) {
+    this.currentUserId = AppSettings.getString("currentUserId", null);
 
-
+    // This is the setup for the backend, no need to change anything
     Firebase
       .init({persist: false})
       .then(() => {
 
-        this.profileStorage
-          .readId()
-          .then((currentUserId) => {
-            console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Reading from profile",
-              currentUserId)
-            this.currentUserId = currentUserId;
-
-            if (!this.currentUserId) {
-              this.createUser()
-                .then((result: FirebaseChildEvent) => {
-                  console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Creating profile",
-                    JSON.stringify(result, null, 2))
-                  this.profileStorage
-                    .storeId(result.key)
-                    .then(() => {
-                      console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Storing profile",
-                        JSON.stringify(result, null, 2))
-                      this.currentUserId = result.key;
-                      this.profileStorage
-                        .readId()
-                        .then((newRead) => {
-                          console.log(" %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% New Reading from profile",
-                            newRead)
-                        });
-
-                    })
-                })
-            }
-          });
-
+        if (!this.currentUserId) {
+          this.createUser()
+            .then((result:FirebaseChildEvent) => {
+              this.currentUserId = result.key;
+              AppSettings.setString("currentUserId", this.currentUserId);
+              console.info('User created ', this.currentUserId)
+            })
+        }
 
         Firebase.addChildEventListener((result: FirebaseChildEvent) => {
           this.ngZone.run(() => {
@@ -77,8 +56,7 @@ export default  class ChatService {
   }
 
 
-  addChildEvenListener(firebaseEvent: FirebaseChildEvent, localSubject$): void {
-    // console.log('&&&&&&&&& Result &&&&&&&&&', JSON.stringify(firebaseEvent, null, 2));
+  private addChildEvenListener(firebaseEvent: FirebaseChildEvent, localSubject$): void {
     const currentValue = localSubject$.getValue();
 
     switch (firebaseEvent.type) {
@@ -95,15 +73,28 @@ export default  class ChatService {
     }
   }
 
-  allRooms() {
+  /**
+   * Use this method to get access all the rooms
+   * @returns {Observable<RoomMap>}
+   */
+  allRooms():Observable<RoomMap> {
     return this.rooms$.asObservable();
   }
 
-  getRoom(roomId) {
+  /**
+   * Use this method to get access to a specific by id
+   * @param roomId
+   * @returns {Observable<Room>}
+   */
+  getRoom(roomId:string): Observable<Room>{
     return this.rooms$.map(rooms => rooms[roomId]);
   }
 
-  addRoom(roomName) {
+  /**
+   * Use this method to create a new room on the backend
+   * @param roomName
+   */
+  addRoom(roomName:string):void{
     const name = roomName.trim();
     if (name) {
       Firebase.push(
@@ -115,7 +106,7 @@ export default  class ChatService {
     }
   }
 
-  createUser() {
+  private createUser() {
     return Firebase.push(
       '/users',
       {
@@ -125,26 +116,46 @@ export default  class ChatService {
     );
   }
 
-  getConnectedUser() {
+  /**
+   * Use this method to get access to the currently connected user
+   * @returns {Observable<User>}
+   */
+  getConnectedUser():Observable<User> {
     return this.getUserById(this.currentUserId)
   }
 
-  getUsers() {
+  /**
+   * Use this method to get access all users
+   * @returns {Observable<UserMap>}
+   */
+  getUsers():Observable<UserMap> {
     return this.user$.asObservable();
   }
 
-  getUserById(id) {
+
+  private getUserById(id) {
     return this.user$.map(users => users[id]);
   }
 
-  setUser({name, image}) {
+  /**
+   * Use this method to update the user profile
+   * @param name
+   * @param image
+   * @returns {Promise<any>}
+   */
+  updateProfile({name, image}):Promise<any> {
     return Firebase.update(`/users/${this.currentUserId}`, {
       name,
       image
     });
   }
 
-  getRoomMessages(roomId): Observable<any[]> {
+  /**
+   * Use this method to get all messages for a specific room
+   * @param roomId
+   * @returns {Observable<Message[]>}
+   */
+  getRoomMessages(roomId:string): Observable<Message[]> {
     return this.messages$
       .map((values) => {
         const messages = Object.keys(values)
@@ -152,10 +163,15 @@ export default  class ChatService {
           .filter(m => m.roomId === roomId)
         return messages;
       });
-
   }
 
-  addMessage(roomId, body) {
+  /**
+   * Use this method to add a new message to a specific room
+   * @param roomId
+   * @param body
+   * @returns Promise<any>
+   */
+  addMessage(roomId:string, body:string): Promise<any>{
     if (body) {
       return Firebase.push(
         `/messages`,

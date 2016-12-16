@@ -46,7 +46,7 @@ export class ProfileComponent implements OnInit {
 
   onSave() {
     this.chatService
-      .setUser(this.user)
+      .updateProfile(this.user)
       .then(() => {
         this.goBack();
       });
